@@ -1,0 +1,83 @@
+---
+- name: Configure Basic Samba Share with Guest Access
+  hosts: samba_servers  # Your Samba server(s)
+  become: yes
+  vars:
+    samba_workgroup: "MYGROUP"
+    samba_share_name: "public"
+    samba_share_path: "/srv/samba/public"
+    samba_guest_ok: "yes"
+    samba_writable: "yes"
+    samba_browsable: "yes"
+
+  tasks:
+    - name: Install Samba Packages
+      ansible.builtin.package:
+        name:
+          - samba
+          - samba-common
+        state: present
+
+    - name: Ensure Share Directory Exists
+      ansible.builtin.file:
+        path: "{{ samba_share_path }}"
+        state: directory
+        owner: nobody
+        group: nogroup
+        mode: '0777' # Adjust permissions as needed
+
+    - name: Configure smb.conf
+      ansible.builtin.template:
+        src: templates/smb_basic.conf.j2
+        dest: /etc/samba/smb.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart smbd nmbd
+
+    - name: Ensure smbd and nmbd services are started and enabled
+      ansible.builtin.service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - smbd
+        - nmbd
+
+    - name: Open Samba ports in firewall (if firewalld)
+      ansible.builtin.firewalld:
+        service: samba
+        permanent: yes
+        state: enabled
+      when: ansible_facts['service_mgr'] == "systemd" and ansible_facts['distribution'] in ["CentOS", "RHEL", "Fedora"]
+      notify: Reload firewalld
+
+    - name: Open Samba ports in firewall (if ufw)
+      community.general.ufw:
+        rule: allow
+        port:
+          - 137/udp
+          - 138/udp
+          - 139/tcp
+          - 445/tcp
+        proto: any
+      when: ansible_facts['service_mgr'] == "systemd" and ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+      notify: Reload ufw
+
+  handlers:
+    - name: Restart smbd nmbd
+      ansible.builtin.service:
+        name: "{{ item }}"
+        state: restarted
+      loop:
+        - smbd
+        - nmbd
+
+    - name: Reload firewalld
+      ansible.builtin.service:
+        name: firewalld
+        state: reloaded
+
+    - name: Reload ufw
+      community.general.ufw:
+        state: reloaded

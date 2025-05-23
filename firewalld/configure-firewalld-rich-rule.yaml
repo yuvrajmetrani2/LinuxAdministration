@@ -1,0 +1,34 @@
+---
+- name: Configure firewalld with a rich rule
+  hosts: firewall_hosts
+  become: yes
+  vars:
+    rich_rule_http_limited: 'rule family="ipv4" source address="10.0.0.10" port protocol=tcp port=80 accept'
+    rich_rule_log_smtp: 'rule family="ipv4" port protocol=tcp port=25 log prefix="SMTP Access: " level="info" accept'
+
+  tasks:
+    - name: Ensure firewalld is running and enabled
+      ansible.builtin.service:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Add a rich rule to allow HTTP from a specific IP (permanent)
+      community.general.firewalld:
+        rich_rule: "{{ rich_rule_http_limited }}"
+        permanent: yes
+        state: enabled
+      notify: Reload firewalld
+
+    - name: Add a rich rule to log SMTP traffic (permanent)
+      community.general.firewalld:
+        rich_rule: "{{ rich_rule_log_smtp }}"
+        permanent: yes
+        state: enabled
+      notify: Reload firewalld
+
+  handlers:
+    - name: Reload firewalld
+      ansible.builtin.service:
+        name: firewalld
+        state: reloaded

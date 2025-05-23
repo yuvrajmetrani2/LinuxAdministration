@@ -1,0 +1,21 @@
+Ansible Workflow for firewalld Configuration
+Automating firewalld configuration with Ansible typically involves these steps:
+
+Inventory Management: Define the target Linux hosts in your Ansible inventory.
+
+Playbook Creation: Develop an Ansible playbook with tasks to:
+
+Ensure firewalld is Running and Enabled: Use the service module to start and enable the firewalld service.
+Manage Zones: Set the default zone for interfaces using the firewalld module.
+Manage Services: Allow or block traffic for predefined services in specific zones using the firewalld module.
+Manage Ports and Protocols: Allow or block traffic for specific ports and protocols in specific zones using the firewalld module.
+Manage Sources: Apply rules based on source IP addresses or networks using the firewalld module.
+Manage Rich Rules: Add more complex rules using the firewalld module.
+Manage Direct Rules (Use with Caution): Add raw iptables rules using the firewalld module with the direct parameter.
+Save Permanent Configuration: Ensure changes are saved to the permanent configuration using the firewalld module with permanent: yes.
+Reload firewalld: Apply permanent changes to the runtime configuration using the firewalld module with state: reloaded.
+Variable Definition: Define firewalld configuration parameters as Ansible variables (e.g., default zone, services to allow per zone, ports, sources, rich rules).
+
+Playbook Execution: Run the Ansible playbook against the target hosts using ansible-playbook.
+
+Verification (Recommended): Include tasks to verify the firewalld status and the active rules using the command module with firewall-cmd --list-all --permanent and firewall-cmd --list-all.

@@ -1,0 +1,18 @@
+Best Practices for firewalld Configuration with Ansible
+Use the firewalld Module: Ansible's built-in firewalld module provides a consistent and idempotent way to manage firewalld rules. Avoid directly manipulating iptables rules unless absolutely necessary.
+
+Define Variables Clearly: Use well-named variables to represent zones, services, ports, and sources. This makes your playbooks more readable and maintainable.
+
+Manage Runtime and Permanent Configuration: Be mindful of whether you are making runtime or permanent changes. Always save important changes to the permanent configuration.
+
+Use Services When Possible: Leverage predefined firewalld services instead of manually specifying ports and protocols whenever applicable. This makes the configuration more semantic.
+
+Be Specific with Sources: When restricting access, be as specific as possible with source IP addresses or networks.
+
+Review Default Zones: Ensure the default zone for your interfaces is appropriate for the network environment.
+
+Test Your Rules: After applying firewalld configurations, verify that the intended traffic is allowed and unintended traffic is blocked.
+
+Idempotency: The firewalld module is generally idempotent. Ensure your playbook design doesn't introduce non-idempotent actions.
+
+Consider Logging: For security auditing, use rich rules to log specific types of traffic.

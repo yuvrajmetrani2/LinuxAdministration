@@ -1,0 +1,50 @@
+---
+- name: Configure basic firewalld rules
+  hosts: firewall_hosts
+  become: yes
+  vars:
+    default_firewall_zone: "public"
+    allowed_services_public:
+      - ssh
+      - http
+      - https
+    allowed_ports_public:
+      - "8080/tcp" # Example custom port
+
+  tasks:
+    - name: Ensure firewalld is running and enabled
+      ansible.builtin.service:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Set default firewall zone
+      community.general.firewalld:
+        default: "{{ default_firewall_zone }}"
+        permanent: yes
+        state: enabled
+      notify: Reload firewalld
+
+    - name: Allow services in the default zone (permanent)
+      community.general.firewalld:
+        service: "{{ item }}"
+        permanent: yes
+        state: enabled
+        zone: "{{ default_firewall_zone }}"
+      loop: "{{ allowed_services_public }}"
+      notify: Reload firewalld
+
+    - name: Allow ports in the default zone (permanent)
+      community.general.firewalld:
+        port: "{{ item }}"
+        permanent: yes
+        state: enabled
+        zone: "{{ default_firewall_zone }}"
+      loop: "{{ allowed_ports_public }}"
+      notify: Reload firewalld
+
+  handlers:
+    - name: Reload firewalld
+      ansible.builtin.service:
+        name: firewalld
+        state: reloaded

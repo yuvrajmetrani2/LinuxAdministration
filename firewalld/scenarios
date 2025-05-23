@@ -1,0 +1,14 @@
+Various Scenarios for firewalld Configuration
+Ansible can automate various firewalld configuration scenarios:
+
+Basic Service Allowance: Allowing standard services like SSH, HTTP, and HTTPS in the public or work zone.
+
+Port-Specific Access: Opening specific ports for custom applications or services.
+
+Source-Based Restrictions: Allowing access to certain services or ports only from specific IP addresses or networks.
+
+Zone-Based Security: Assigning different network interfaces to appropriate security zones (e.g., external for a public-facing interface, internal for a private network interface).
+
+Implementing Rich Rules for Complex Scenarios: Creating rules that log specific traffic or combine multiple conditions.
+
+Setting Default Zones: Ensuring a consistent default security posture across servers.

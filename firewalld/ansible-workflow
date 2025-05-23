@@ -19,3 +19,5 @@ Variable Definition: Define firewalld configuration parameters as Ansible variab
 Playbook Execution: Run the Ansible playbook against the target hosts using ansible-playbook.
 
 Verification (Recommended): Include tasks to verify the firewalld status and the active rules using the command module with firewall-cmd --list-all --permanent and firewall-cmd --list-all.
+
+The firewalld module in Ansible is powerful and allows for granular control over your firewall configuration.

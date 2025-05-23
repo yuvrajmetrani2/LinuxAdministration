@@ -1,0 +1,25 @@
+Concepts of firewalld Configuration
+firewalld provides a dynamic and stateful firewall solution. Understanding its core concepts is crucial for effective automation:
+
+Zones: firewalld organizes network interfaces and traffic into different security zones. Each zone represents a level of trust. Common zones include:
+
+drop: All incoming connections are dropped without any response. Only outgoing connections are possible.
+block: Incoming connections are rejected with an icmp-host-prohibited or icmp6-adm-prohibited message. Only outgoing connections are possible.
+public: For use in untrusted public areas. You do not trust other computers on the network but may allow selected incoming connections.
+external: For use on external networks with masquerading enabled especially for routers. You trust the other computers on the network to prevent harm to your network. Only selected incoming connections are accepted.
+dmz: For computers in a demilitarized zone accessible from the public but with limited access to your internal network. Only selected incoming connections are accepted.
+work: For use in work areas. You generally trust the other computers on the network. Only selected incoming connections are accepted.
+home: For use in home areas. You generally trust the other computers on the network. Only selected incoming connections are accepted.
+internal: For use on internal networks. You generally trust the other computers on the network. Only selected incoming connections are accepted.
+trusted: All network connections are accepted.
+Services: firewalld has predefined services (e.g., http, https, ssh, samba) that represent a set of ports and protocols. You can easily allow traffic for these services in specific zones.
+
+Ports and Protocols: You can also directly specify ports and protocols (e.g., TCP port 80, UDP port 53) to allow traffic.
+
+Sources: Rules can be limited to traffic originating from specific source IP addresses, IP ranges, or network interfaces.
+
+Rich Rules: These are more complex rules that combine sources, destinations, services, ports, and actions (accept, reject, drop, log).
+
+Direct Interface: This allows you to add raw iptables or ip6tables rules directly, bypassing firewalld's zone-based management. Use this with caution as it can make the configuration harder to manage.
+
+Runtime vs. Permanent Configuration: firewalld has a runtime configuration that is active immediately and a permanent configuration that is applied on the next reboot or when explicitly loaded. It's important to save changes to the permanent configuration.

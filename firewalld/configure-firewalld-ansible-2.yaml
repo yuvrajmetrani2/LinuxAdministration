@@ -1,0 +1,47 @@
+---
+- name: Configure advanced firewalld rules with zones and sources
+  hosts: firewall_hosts
+  become: yes
+  vars:
+    interface_zones:
+      - interface: eth0
+        zone: external
+      - interface: eth1
+        zone: internal
+    internal_allowed_sources:
+      - "192.168.10.0/24"
+    internal_allowed_services:
+      - ssh
+      - postgresql
+
+  tasks:
+    - name: Ensure firewalld is running and enabled
+      ansible.builtin.service:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Set zone for interfaces (permanent)
+      community.general.firewalld:
+        interface: "{{ item.interface }}"
+        zone: "{{ item.zone }}"
+        permanent: yes
+        state: enabled
+      loop: "{{ interface_zones }}"
+      notify: Reload firewalld
+
+    - name: Allow services from internal sources in the internal zone (permanent)
+      community.general.firewalld:
+        service: "{{ item }}"
+        source: "{{ internal_allowed_sources }}"
+        zone: internal
+        permanent: yes
+        state: enabled
+      loop: "{{ internal_allowed_services }}"
+      notify: Reload firewalld
+
+  handlers:
+    - name: Reload firewalld
+      ansible.builtin.service:
+        name: firewalld
+        state: reloaded
